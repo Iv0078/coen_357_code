@@ -7,18 +7,40 @@
     tools:context=".MainActivity"
     android:background="@drawable/black_background">
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/measurebtn"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_marginTop="100dp"
         android:background="@drawable/oval_btn"
         android:gravity="center_vertical|center_horizontal"
-        android:text="Measure noise"
-        android:textColor="#fff"
+        android:text="Start measuring"
+        android:textColor="#C3FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="70dp"
+        android:text="Listening History"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/measurebtn" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="40dp"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/baseline_notifications_active_24"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
