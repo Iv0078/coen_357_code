@@ -1,5 +1,6 @@
 package com.example.coen357_final_sound;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -9,6 +10,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -26,8 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        // TO do:
-//        startActivity(new Intent(MainActivity.this,SignIn.class));
+
 
         SharedPreferences sh = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
         String accountType = sh.getString("ACCOUNTTYPE","");
@@ -52,6 +53,13 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        TextView titleName = findViewById(R.id.toolbar_title);
+        titleName.setText("");
+
+
     }
 
     @Override
@@ -61,5 +69,18 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        Intent intent = new Intent(MainActivity.this,SignIn.class);
+        startActivity(intent);
+        if(id == R.id.sign_out){
 
+        }
+
+
+        return super.onOptionsItemSelected(item);
+
+
+    }
 }

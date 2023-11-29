@@ -8,6 +8,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.media.MediaRecorder;
@@ -19,9 +22,14 @@ import android.view.ViewTreeObserver;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.security.Permission;
+import java.text.DecimalFormat;
+import java.text.Format;
+
+import androidx.appcompat.widget.Toolbar;
 
 public class SoundMeasuring extends AppCompatActivity {
 
@@ -30,7 +38,11 @@ public class SoundMeasuring extends AppCompatActivity {
     private ScreenVisualization screenVisualization;
     private MediaRecorder recorder;
     private Handler handler = new Handler();
-    TextView txtName;
+    TextView mainDb, comparissonDb;
+
+
+    private static double ambient = 0.0;
+    static final private double filter = 0.6;
 
 
     final Runnable updater = new Runnable() {
@@ -46,6 +58,7 @@ public class SoundMeasuring extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 if(maxAmplitude>0){
+                    mainDb.setText("maxAmplitude");
                     screenVisualization.addAmplitude(maxAmplitude);
                 }
 
@@ -56,8 +69,9 @@ public class SoundMeasuring extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
         setContentView(R.layout.activity_sound_measuring);
+
+
         screenVisualization = (ScreenVisualization) findViewById(R.id.visualization);
 
 
@@ -67,8 +81,25 @@ public class SoundMeasuring extends AppCompatActivity {
                 startSoundListening();
             }
         });
-        
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        TextView titleName = findViewById(R.id.toolbar_title);
+        titleName.setText("Sound Meter");
+
+        mainDb = findViewById(R.id.db_val);
+        comparissonDb = findViewById(R.id.db_comp);
+
+        Intent serviceIntent = new Intent(this, MyForegroundService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+            foregroundServiceRunning();
+
+        }
     }
 
     private void RequestPermissions(){
@@ -93,6 +124,8 @@ public class SoundMeasuring extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
         switch(requestCode){
             case APP_PERMISSIONS_RECORD_AUDIO:{
                 if(grantResults.length>0){
@@ -106,7 +139,7 @@ public class SoundMeasuring extends AppCompatActivity {
                 }
             }
         }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
     }
 
     private void startSoundListening() {
@@ -142,6 +175,39 @@ public class SoundMeasuring extends AppCompatActivity {
 
     }
 
+
+    public double soundDb(double ampl){
+
+        double dbSPL = 20 * Math.log10(presSoundPA() / ampl);
+
+        if (dbSPL < 0){
+            return 0;
+        }
+        else {
+            return dbSPL;
+        }
+
+    }
+    public double soundAmbient() {
+        if (recorder != null)
+            return  (recorder.getMaxAmplitude());
+        else
+            return 0;
+
+    }
+    public double presSoundPA() {
+        double amp =  soundAmbient();
+        ambient = filter * amp + (1.0 - filter) * ambient;
+        return ambient;
+    }
+
+    public void soundDb(){
+        DecimalFormat df1 = new DecimalFormat("####.0");
+        double decib = soundDb(20);
+        String decib1 = df1.format(decib);
+        mainDb.setText(decib1 + " dB");
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -164,6 +230,18 @@ public class SoundMeasuring extends AppCompatActivity {
         super.onWindowFocusChanged(hasFocus);
         handler.post(updater);
     }
+
+   public boolean foregroundServiceRunning(){
+        ActivityManager activityManager = (ActivityManager)  getSystemService(Context.ACTIVITY_SERVICE);
+
+        for(ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)){
+            if(MyForegroundService.class.getName().equals(service.service.getClassName())){
+                return true;
+            }
+        }
+        return false;
+   }
+
 
 
 }
