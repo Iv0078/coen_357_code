@@ -16,7 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.COEN357_FINAL_SOUND"
         tools:targetApi="31">
-
+        <activity
+            android:name=".notificationControl"
+            android:exported="false" />
         <activity
             android:name=".SoundMeasuring"
             android:exported="true"
@@ -37,7 +39,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".MyForegroundService"></service>
+
+        <service android:name=".MyForegroundService" />
     </application>
 
 </manifest>
