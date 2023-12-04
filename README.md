@@ -9,5 +9,6 @@ The following is a sound dectector application created for SOEN 357
 # Features
 * The app can run in the background if it is minimized
 * If the decibel level exceeds 70 db a notification will be sent
-#Disclaimer
+  
+# Disclaimer
 The app is still in development and it is missing features or not all features work properly
